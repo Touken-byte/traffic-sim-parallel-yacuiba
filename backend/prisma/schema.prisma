@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ModoEjecucion {
+  SECUENCIAL
+  CPU
+  GPU
+}
+
+enum TipoConfiguracion {
+  RAPIDA
+  AVANZADA
+}
+
+enum TipoVehiculo {
+  AUTO
+  MOTO
+  BUS
+}
+
+enum FormatoExportacion {
+  CSV
+  IMAGEN
+}
+
+model Simulacion {
+  id                Int                     @id @default(autoincrement())
+  modo              ModoEjecucion
+  tipoConfiguracion TipoConfiguracion
+  numVehiculos      Int
+  duracionTicks     Int
+  semilla           Int
+  fechaEjecucion    DateTime                @default(now())
+  vehiculos         ConfiguracionVehiculo[]
+  metrica           Metrica?
+  exportaciones     Exportacion[]
+}
+
+model ConfiguracionVehiculo {
+  id            Int          @id @default(autoincrement())
+  simulacion    Simulacion   @relation(fields: [simulacionId], references: [id])
+  simulacionId  Int
+  tipo          TipoVehiculo
+  cantidad      Int
+  velocidadMax  Float
+}
+
+model Metrica {
+  id                  Int        @id @default(autoincrement())
+  simulacion          Simulacion @relation(fields: [simulacionId], references: [id])
+  simulacionId        Int        @unique
+  tiempoEjecucionMs   Float
+  velocidadPromedio   Float
+  congestionPromedio  Float
+  speedup             Float
+  eficiencia          Float
+}
+
+model Exportacion {
+  id           Int                @id @default(autoincrement())
+  simulacion   Simulacion         @relation(fields: [simulacionId], references: [id])
+  simulacionId Int
+  rutaArchivo  String
+  formato      FormatoExportacion
+  creadoEn     DateTime           @default(now())
+}
