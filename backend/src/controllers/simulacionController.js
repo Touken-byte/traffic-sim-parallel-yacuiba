@@ -3,21 +3,33 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const MOTOR_URL = process.env.MOTOR_SIMULACION_URL || 'http://motor-simulacion:5000';
-
+const GPU_MOTOR_URL = process.env.GPU_MOTOR_URL;
 async function crearSimulacion(req, res) {
   try {
     const { modo, tipoConfiguracion, duracionTicks, semilla, vehiculos } = req.body;
 
     const numVehiculos = vehiculos.reduce((acc, v) => acc + v.cantidad, 0);
 
-    // 1. Correr el modo solicitado
-    const respuestaModo = await axios.post(`${MOTOR_URL}/simular`, {
-      modo,
-      duracionTicks,
-      semilla,
-      vehiculos,
-    });
-    const resultadoModo = respuestaModo.data;
+    // 1. Correr el modo solicitado (motor local para SECUENCIAL/CPU, Colab para GPU)
+    let resultadoModo;
+    if (modo === 'GPU') {
+      if (!GPU_MOTOR_URL) {
+        throw new Error('GPU_MOTOR_URL no está configurada en el .env');
+      }
+      const respuestaGpu = await axios.post(`${GPU_MOTOR_URL}/simular_gpu`, {
+        duracionTicks,
+        vehiculos,
+      });
+      resultadoModo = respuestaGpu.data;
+    } else {
+      const respuestaModo = await axios.post(`${MOTOR_URL}/simular`, {
+        modo,
+        duracionTicks,
+        semilla,
+        vehiculos,
+      });
+      resultadoModo = respuestaModo.data;
+    }
 
     // 2. Si el modo no es SECUENCIAL, correr también el secuencial como base de comparación
     let tiempoSecuencialMs = resultadoModo.tiempoEjecucionMs;
