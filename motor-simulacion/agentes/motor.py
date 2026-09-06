@@ -6,7 +6,7 @@ class MotorSimulacion:
         self.configuracion_vehiculos = configuracion_vehiculos
         self.duracion_ticks = duracion_ticks
         self.semilla = semilla
-        self.vehiculos = generar_vehiculos(configuracion_vehiculos)
+        self.vehiculos = generar_vehiculos(configuracion_vehiculos, semilla)
         self.historial = []
 
     def ejecutar_tick(self):

@@ -1,0 +1,54 @@
+* { box-sizing: border-box; font-family: Arial, sans-serif; }
+body {
+  margin: 0;
+  padding: 40px 20px;
+  background: #1a1a2e;
+  color: #eaeaea;
+  display: flex;
+  justify-content: center;
+}
+.contenedor {
+  background: #16213e;
+  padding: 30px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 520px;
+}
+h1 { color: #e94560; text-align: center; margin-bottom: 5px; }
+.subtitulo { text-align: center; color: #a0a0c0; margin-bottom: 25px; font-size: 14px; }
+
+.tabs { display: flex; margin-bottom: 20px; border-radius: 8px; overflow: hidden; }
+.tab {
+  flex: 1; padding: 10px; text-align: center; cursor: pointer;
+  background: #0f3460; color: #a0a0c0; font-weight: bold;
+}
+.tab.activo { background: #e94560; color: white; }
+
+label { display: block; margin: 12px 0 5px; font-size: 14px; color: #c0c0e0; }
+input[type="number"] {
+  width: 100%; padding: 8px; border-radius: 6px; border: none;
+  background: #0f3460; color: white; font-size: 14px;
+}
+
+.fila-vehiculo {
+  display: flex; align-items: center; gap: 10px; margin: 10px 0;
+  background: #0f3460; padding: 10px; border-radius: 8px;
+}
+.fila-vehiculo .color-punto { width: 14px; height: 14px; border-radius: 50%; }
+.fila-vehiculo span.tipo { width: 60px; font-weight: bold; }
+.fila-vehiculo input { width: 80px; }
+
+.oculto { display: none; }
+
+button.iniciar {
+  width: 100%; margin-top: 25px; padding: 12px; border: none;
+  border-radius: 8px; background: #e94560; color: white;
+  font-size: 16px; font-weight: bold; cursor: pointer;
+}
+button.iniciar:hover { background: #d13350; }
+button.iniciar:disabled { background: #555; cursor: not-allowed; }
+
+#resultado {
+  margin-top: 20px; padding: 15px; background: #0f3460;
+  border-radius: 8px; font-size: 14px; white-space: pre-wrap;
+}

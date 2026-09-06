@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from paralelismo.secuencial import ejecutar_secuencial
+from paralelismo.cpu_paralelo import ejecutar_cpu_paralelo
 
 app = Flask(__name__)
 
@@ -20,6 +21,8 @@ def simular():
 
     if modo == "SECUENCIAL":
         resultado = ejecutar_secuencial(configuracion_vehiculos, duracion_ticks, semilla)
+    elif modo == "CPU":
+        resultado = ejecutar_cpu_paralelo(configuracion_vehiculos, duracion_ticks, semilla)
     else:
         return jsonify({"error": f"Modo {modo} aún no implementado"}), 400
 

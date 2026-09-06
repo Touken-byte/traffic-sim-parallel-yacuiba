@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Tráfico - Configuración</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="contenedor">
+    <h1>🚦 Simulador de Tráfico</h1>
+    <p class="subtitulo">Yacuiba, Bolivia — Plaza · Mercado · Terminal</p>
+
+    <div class="tabs">
+      <div class="tab activo" data-modo="RAPIDA">Modo Rápido</div>
+      <div class="tab" data-modo="AVANZADA">Modo Avanzado</div>
+    </div>
+
+    <div id="panel-rapido">
+      <label>Número total de vehículos</label>
+      <input type="number" id="totalVehiculos" value="10" min="1" max="200">
+    </div>
+
+    <div id="panel-avanzado" class="oculto">
+      <div class="fila-vehiculo">
+        <span class="color-punto" style="background:#3b82f6"></span>
+        <span class="tipo">Auto</span>
+        <label style="margin:0">Cant.</label>
+        <input type="number" id="cantAuto" value="6" min="0">
+        <label style="margin:0">Vel. máx</label>
+        <input type="number" id="velAuto" value="40" min="1">
+      </div>
+      <div class="fila-vehiculo">
+        <span class="color-punto" style="background:#eab308"></span>
+        <span class="tipo">Moto</span>
+        <label style="margin:0">Cant.</label>
+        <input type="number" id="cantMoto" value="3" min="0">
+        <label style="margin:0">Vel. máx</label>
+        <input type="number" id="velMoto" value="55" min="1">
+      </div>
+      <div class="fila-vehiculo">
+        <span class="color-punto" style="background:#ef4444"></span>
+        <span class="tipo">Bus</span>
+        <label style="margin:0">Cant.</label>
+        <input type="number" id="cantBus" value="1" min="0">
+        <label style="margin:0">Vel. máx</label>
+        <input type="number" id="velBus" value="25" min="1">
+      </div>
+    </div>
+
+    <label>Duración de la simulación (ticks)</label>
+    <input type="number" id="duracionTicks" value="20" min="1" max="500">
+
+    <label>Semilla aleatoria (reproducibilidad)</label>
+    <input type="number" id="semilla" value="42">
+
+    <button class="iniciar" id="btnIniciar">Iniciar Simulación</button>
+
+    <div id="resultado" class="oculto"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/config.js"></script>
+</body>
+</html>

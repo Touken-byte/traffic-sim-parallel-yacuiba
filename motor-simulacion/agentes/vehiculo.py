@@ -1,5 +1,4 @@
 import random
-from utils.grafo import generar_ruta_aleatoria
 
 TIPOS_VEHICULO = {
     "AUTO": {"velocidad_max": 40, "color": "azul", "ocupacion": 1.0},
@@ -18,27 +17,31 @@ class Vehiculo:
         self.ruta = ruta
         self.indice_ruta = 0
         self.velocidad_actual = 0
-        self.distancia_seguridad = 5  # metros
+        self.distancia_seguridad = 2  # en "pasos" de ruta
 
-    def avanzar(self, vehiculo_precedente=None):
-        """Avanza un tick respetando velocidad máxima y distancia de seguridad."""
+    def calcular_siguiente(self, indice_precedente=None):
+        """
+        Calcula (sin modificar el estado todavía) cuál sería el siguiente
+        índice de ruta, posición y velocidad de este vehículo, dado el
+        índice del vehículo precedente en el tick anterior.
+        Devuelve una tupla (nuevo_indice, nueva_posicion, nueva_velocidad).
+        """
         if self.indice_ruta >= len(self.ruta) - 1:
-            return  # llegó a destino
+            return (self.indice_ruta, self.posicion_actual, 0)
 
-        self.velocidad_actual = self.velocidad_max
+        velocidad = self.velocidad_max
 
-        if vehiculo_precedente:
-            distancia = self._calcular_distancia(vehiculo_precedente)
+        if indice_precedente is not None:
+            distancia = abs(self.indice_ruta - indice_precedente)
             if distancia < self.distancia_seguridad:
-                self.velocidad_actual = 0
+                velocidad = 0
 
-        if self.velocidad_actual > 0:
-            self.indice_ruta += 1
-            self.posicion_actual = self.ruta[self.indice_ruta]
+        if velocidad > 0:
+            nuevo_indice = self.indice_ruta + 1
+            nueva_posicion = self.ruta[nuevo_indice]
+            return (nuevo_indice, nueva_posicion, velocidad)
 
-    def _calcular_distancia(self, otro_vehiculo):
-        # Simplificación inicial: distancia por índice de ruta
-        return abs(self.indice_ruta - otro_vehiculo.indice_ruta)
+        return (self.indice_ruta, self.posicion_actual, 0)
 
     def to_dict(self):
         return {
@@ -50,11 +53,11 @@ class Vehiculo:
         }
 
 
-def generar_vehiculos(configuracion, grafo_nodos=None):
-    """
-    configuracion: lista de dicts [{tipo, cantidad, velocidadMax}, ...]
-    grafo_nodos ya no se usa directamente; cada vehículo genera su propia ruta real.
-    """
+def generar_vehiculos(configuracion, semilla=42):
+    from utils.grafo import generar_ruta_aleatoria
+
+    random.seed(semilla)
+
     vehiculos = []
     contador = 0
     for conf in configuracion:
