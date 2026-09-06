@@ -44,19 +44,26 @@ document.getElementById('btnIniciar').addEventListener('click', async () => {
   boton.textContent = 'Simulando...';
   resultadoDiv.classList.add('oculto');
 
-  try {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+  try {
     const data = await crearSimulacion(payload);
     resultadoDiv.classList.remove('oculto');
+
     resultadoDiv.textContent =
       `✅ Simulación #${data.simulacion.id} completada (${data.simulacion.modo})\n` +
       `Vehículos: ${data.simulacion.numVehiculos}\n` +
       `Tiempo de ejecución: ${data.simulacion.metrica.tiempoEjecucionMs.toFixed(2)} ms\n` +
       `Tiempo secuencial (referencia): ${data.tiempoSecuencialMs.toFixed(2)} ms\n` +
       `Speedup: ${data.simulacion.metrica.speedup.toFixed(3)}\n` +
-      `Eficiencia: ${data.simulacion.metrica.eficiencia.toFixed(3)}`;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+      `Eficiencia: ${data.simulacion.metrica.eficiencia.toFixed(3)}`;
+
+    if (data.historial && data.historial.length > 0) {
+      reproducirHistorial(data.historial);
+    }
+
   } catch (error) {
     resultadoDiv.classList.remove('oculto');
     resultadoDiv.textContent = `❌ Error: ${error.message}`;
+
   } finally {
     boton.disabled = false;
     boton.textContent = 'Iniciar Simulación';

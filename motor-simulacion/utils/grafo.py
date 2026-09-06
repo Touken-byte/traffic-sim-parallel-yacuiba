@@ -51,3 +51,20 @@ def generar_ruta_aleatoria():
         intentos += 1
 
     return [origen, origen]
+
+_coordenadas = None
+
+
+def obtener_coordenadas():
+    """Devuelve un diccionario {nodo_id: (lon, lat)} para todos los nodos del grafo."""
+    global _coordenadas
+    if _coordenadas is None:
+        grafo = cargar_grafo()
+        coords = {}
+        for nodo, datos in grafo.nodes(data=True):
+            try:
+                coords[nodo] = (float(datos.get("x", 0)), float(datos.get("y", 0)))
+            except (TypeError, ValueError):
+                coords[nodo] = (0.0, 0.0)
+        _coordenadas = coords
+    return _coordenadas
