@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from paralelismo.secuencial import ejecutar_secuencial
 from paralelismo.cpu_paralelo import ejecutar_cpu_paralelo
+from utils.grafo import obtener_aristas
 
 app = Flask(__name__)
 
@@ -8,6 +9,11 @@ app = Flask(__name__)
 @app.route("/", methods=["GET"])
 def salud():
     return jsonify({"mensaje": "Motor de simulación funcionando correctamente"})
+
+
+@app.route("/grafo", methods=["GET"])
+def grafo():
+    return jsonify({"aristas": obtener_aristas()})
 
 
 @app.route("/simular", methods=["POST"])

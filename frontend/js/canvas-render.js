@@ -1,3 +1,7 @@
+let aristasGrafo = [];
+let limitesGrafo = null;
+const vista = { zoom: 1, offsetX: 0, offsetY: 0, arrastrando: false, ultimoX: 0, ultimoY: 0 };
+
 const simEstado = {
   historial: [],
   tickActual: 0,
@@ -11,13 +15,11 @@ function dibujarVehiculo(ctx, x, y, tipo, color, detenido) {
   ctx.fillStyle = detenido ? '#555b6e' : color;
 
   if (tipo === 'BUS') {
-    // Rectángulo alargado
     ctx.save();
     ctx.translate(x, y);
     ctx.fillRect(-7, -3.5, 14, 7);
     ctx.restore();
   } else if (tipo === 'MOTO') {
-    // Triángulo pequeño
     ctx.beginPath();
     ctx.moveTo(x, y - 4);
     ctx.lineTo(x - 3.5, y + 3);
@@ -25,11 +27,55 @@ function dibujarVehiculo(ctx, x, y, tipo, color, detenido) {
     ctx.closePath();
     ctx.fill();
   } else {
-    // Círculo (AUTO, por defecto)
     ctx.beginPath();
     ctx.arc(x, y, 4, 0, Math.PI * 2);
     ctx.fill();
   }
+}
+
+function calcularLimites() {
+  let lons = [], lats = [];
+
+  aristasGrafo.forEach(([a, b]) => {
+    lons.push(a[0], b[0]);
+    lats.push(a[1], b[1]);
+  });
+
+  if (lons.length === 0) {
+    simEstado.historial.forEach((tick) => tick.forEach((v) => {
+      if (v.lon && v.lat) { lons.push(v.lon); lats.push(v.lat); }
+    }));
+  }
+
+  limitesGrafo = {
+    minLon: Math.min(...lons), maxLon: Math.max(...lons),
+    minLat: Math.min(...lats), maxLat: Math.max(...lats),
+  };
+}
+
+function proyectar(lon, lat, canvas) {
+  const { minLon, maxLon, minLat, maxLat } = limitesGrafo;
+  const xBase = ((lon - minLon) / (maxLon - minLon || 1)) * (canvas.width - 20) + 10;
+  const yBase = canvas.height - (((lat - minLat) / (maxLat - minLat || 1)) * (canvas.height - 20) + 10);
+
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  const x = cx + (xBase - cx) * vista.zoom + vista.offsetX;
+  const y = cy + (yBase - cy) * vista.zoom + vista.offsetY;
+
+  return [x, y];
+}
+
+function dibujarCalles(ctx, canvas) {
+  ctx.strokeStyle = 'rgba(120, 130, 170, 0.35)';
+  ctx.lineWidth = 1;
+  aristasGrafo.forEach(([a, b]) => {
+    const [x1, y1] = proyectar(a[0], a[1], canvas);
+    const [x2, y2] = proyectar(b[0], b[1], canvas);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  });
 }
 
 function dibujarTick(tickIndex) {
@@ -38,29 +84,17 @@ function dibujarTick(tickIndex) {
   const historial = simEstado.historial;
 
   if (!historial[tickIndex]) return;
-
-  let lons = [], lats = [];
-  historial.forEach((tick) => tick.forEach((v) => {
-    if (v.lon && v.lat) { lons.push(v.lon); lats.push(v.lat); }
-  }));
-
-  const minLon = Math.min(...lons), maxLon = Math.max(...lons);
-  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
-
-  function proyectar(lon, lat) {
-    const x = ((lon - minLon) / (maxLon - minLon || 1)) * (canvas.width - 20) + 10;
-    const y = canvas.height - (((lat - minLat) / (maxLat - minLat || 1)) * (canvas.height - 20) + 10);
-    return [x, y];
-  }
+  if (!limitesGrafo) calcularLimites();
 
   const colores = { azul: '#3b82f6', amarillo: '#eab308', rojo: '#ef4444' };
 
-  // Fondo con leve transparencia en vez de limpiar todo de golpe -> crea efecto de estela
-  ctx.fillStyle = 'rgba(10, 17, 40, 0.35)';
+  ctx.fillStyle = '#0a1128';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  dibujarCalles(ctx, canvas);
+
   historial[tickIndex].forEach((v) => {
-    const [x, y] = proyectar(v.lon, v.lat);
+    const [x, y] = proyectar(v.lon, v.lat, canvas);
     const detenido = v.velocidad === 0;
     dibujarVehiculo(ctx, x, y, v.tipo, colores[v.color] || '#ffffff', detenido);
   });
@@ -112,11 +146,12 @@ function reiniciarSimulacion() {
   }
 }
 
-function reproducirHistorial(historial) {
+async function reproducirHistorial(historial) {
   const canvas = document.getElementById('canvasSimulacion');
   const ctx = canvas.getContext('2d');
   canvas.style.display = 'block';
   document.getElementById('controlesSimulacion').classList.remove('oculto');
+  document.getElementById('ayudaZoom').classList.remove('oculto');
 
   const tieneCoordenadas = historial.some((tick) => tick.some((v) => v.lon && v.lat));
   if (!tieneCoordenadas) {
@@ -129,6 +164,16 @@ function reproducirHistorial(historial) {
     return;
   }
 
+  if (aristasGrafo.length === 0) {
+    try {
+      const data = await obtenerGrafo();
+      aristasGrafo = data.aristas;
+    } catch (e) {
+      console.warn('No se pudo cargar el grafo de calles:', e.message);
+    }
+  }
+
+  limitesGrafo = null;
   simEstado.historial = historial;
   simEstado.tickActual = 0;
   simEstado.loop = document.getElementById('loopCheckbox').checked;
@@ -156,4 +201,40 @@ document.getElementById('velocidadReproduccion').addEventListener('change', (e) 
 
 document.getElementById('loopCheckbox').addEventListener('change', (e) => {
   simEstado.loop = e.target.checked;
+});
+
+// --- Zoom (rueda del mouse) y paneo (arrastrar) ---
+const canvasEl = document.getElementById('canvasSimulacion');
+
+canvasEl.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.1 : 0.9;
+  vista.zoom = Math.min(Math.max(vista.zoom * factor, 0.5), 8);
+  if (!simEstado.reproduciendo) dibujarTick(Math.max(simEstado.tickActual - 1, 0));
+});
+
+canvasEl.addEventListener('mousedown', (e) => {
+  vista.arrastrando = true;
+  vista.ultimoX = e.clientX;
+  vista.ultimoY = e.clientY;
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!vista.arrastrando) return;
+  vista.offsetX += e.clientX - vista.ultimoX;
+  vista.offsetY += e.clientY - vista.ultimoY;
+  vista.ultimoX = e.clientX;
+  vista.ultimoY = e.clientY;
+  if (!simEstado.reproduciendo) dibujarTick(Math.max(simEstado.tickActual - 1, 0));
+});
+
+window.addEventListener('mouseup', () => {
+  vista.arrastrando = false;
+});
+
+document.getElementById('btnResetVista').addEventListener('click', () => {
+  vista.zoom = 1;
+  vista.offsetX = 0;
+  vista.offsetY = 0;
+  if (!simEstado.reproduciendo) dibujarTick(Math.max(simEstado.tickActual - 1, 0));
 });

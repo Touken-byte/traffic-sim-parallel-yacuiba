@@ -16,4 +16,8 @@ async function crearSimulacion(payload) {
 
   return respuesta.json();
 }
-
+async function obtenerGrafo() {
+  const respuesta = await fetch(`${API_URL}/simulaciones/grafo`);
+  if (!respuesta.ok) throw new Error('No se pudo cargar el grafo');
+  return respuesta.json();
+}

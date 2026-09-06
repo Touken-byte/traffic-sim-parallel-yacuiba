@@ -68,3 +68,19 @@ def obtener_coordenadas():
                 coords[nodo] = (0.0, 0.0)
         _coordenadas = coords
     return _coordenadas
+
+_aristas_cache = None
+
+
+def obtener_aristas():
+    """Devuelve una lista de [[lon1, lat1], [lon2, lat2]] para cada calle del grafo."""
+    global _aristas_cache
+    if _aristas_cache is None:
+        grafo = cargar_grafo()
+        coords = obtener_coordenadas()
+        aristas = []
+        for origen, destino in grafo.edges():
+            if origen in coords and destino in coords:
+                aristas.append([list(coords[origen]), list(coords[destino])])
+        _aristas_cache = aristas
+    return _aristas_cache
