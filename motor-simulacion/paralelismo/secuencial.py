@@ -2,10 +2,10 @@ import time
 from agentes.motor import MotorSimulacion
 
 
-def ejecutar_secuencial(configuracion_vehiculos, duracion_ticks, semilla, grafo_nodos):
+def ejecutar_secuencial(configuracion_vehiculos, duracion_ticks, semilla):
     inicio = time.perf_counter()
 
-    motor = MotorSimulacion(configuracion_vehiculos, duracion_ticks, semilla, grafo_nodos)
+    motor = MotorSimulacion(configuracion_vehiculos, duracion_ticks, semilla)
     historial = motor.correr()
 
     tiempo_total_ms = (time.perf_counter() - inicio) * 1000
@@ -16,8 +16,8 @@ def ejecutar_secuencial(configuracion_vehiculos, duracion_ticks, semilla, grafo_
     return {
         "tiempoEjecucionMs": tiempo_total_ms,
         "velocidadPromedio": velocidad_promedio,
-        "congestionPromedio": 0,  # se calcula con más detalle en el siguiente sprint
-        "speedup": 1.0,           # el secuencial es la base de comparación
+        "congestionPromedio": 0,
+        "speedup": 1.0,
         "eficiencia": 1.0,
         "historial": historial,
     }

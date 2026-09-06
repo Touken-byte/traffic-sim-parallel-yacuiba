@@ -2,12 +2,11 @@ from .vehiculo import generar_vehiculos
 
 
 class MotorSimulacion:
-    def __init__(self, configuracion_vehiculos, duracion_ticks, semilla, grafo_nodos):
+    def __init__(self, configuracion_vehiculos, duracion_ticks, semilla):
         self.configuracion_vehiculos = configuracion_vehiculos
         self.duracion_ticks = duracion_ticks
         self.semilla = semilla
-        self.grafo_nodos = grafo_nodos
-        self.vehiculos = generar_vehiculos(configuracion_vehiculos, grafo_nodos)
+        self.vehiculos = generar_vehiculos(configuracion_vehiculos)
         self.historial = []
 
     def ejecutar_tick(self):

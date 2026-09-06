@@ -3,9 +3,6 @@ from paralelismo.secuencial import ejecutar_secuencial
 
 app = Flask(__name__)
 
-# Nodos de ejemplo mientras se integra el grafo real de OSMnx
-GRAFO_NODOS_DEMO = list(range(1, 21))
-
 
 @app.route("/", methods=["GET"])
 def salud():
@@ -22,7 +19,7 @@ def simular():
     semilla = data.get("semilla", 42)
 
     if modo == "SECUENCIAL":
-        resultado = ejecutar_secuencial(configuracion_vehiculos, duracion_ticks, semilla, GRAFO_NODOS_DEMO)
+        resultado = ejecutar_secuencial(configuracion_vehiculos, duracion_ticks, semilla)
     else:
         return jsonify({"error": f"Modo {modo} aún no implementado"}), 400
 

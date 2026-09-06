@@ -1,4 +1,5 @@
 import random
+from utils.grafo import generar_ruta_aleatoria
 
 TIPOS_VEHICULO = {
     "AUTO": {"velocidad_max": 40, "color": "azul", "ocupacion": 1.0},
@@ -49,19 +50,17 @@ class Vehiculo:
         }
 
 
-def generar_vehiculos(configuracion, grafo_nodos):
+def generar_vehiculos(configuracion, grafo_nodos=None):
     """
     configuracion: lista de dicts [{tipo, cantidad, velocidadMax}, ...]
-    grafo_nodos: lista de nodos disponibles del grafo
+    grafo_nodos ya no se usa directamente; cada vehículo genera su propia ruta real.
     """
     vehiculos = []
     contador = 0
     for conf in configuracion:
         for _ in range(conf["cantidad"]):
-            nodo_inicial = random.choice(grafo_nodos)
-            destino = random.choice(grafo_nodos)
-            ruta = [nodo_inicial, destino]  # se reemplaza por ruta real del grafo en el siguiente paso
-            vehiculo = Vehiculo(contador, conf["tipo"], nodo_inicial, ruta)
+            ruta = generar_ruta_aleatoria()
+            vehiculo = Vehiculo(contador, conf["tipo"], ruta[0], ruta)
             vehiculos.append(vehiculo)
             contador += 1
     return vehiculos
