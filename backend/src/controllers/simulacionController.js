@@ -10,17 +10,33 @@ async function crearSimulacion(req, res) {
 
     const numVehiculos = vehiculos.reduce((acc, v) => acc + v.cantidad, 0);
 
-    // 1. Llamar al motor de simulación en Python
-    const respuestaMotor = await axios.post(`${MOTOR_URL}/simular`, {
+    // 1. Correr el modo solicitado
+    const respuestaModo = await axios.post(`${MOTOR_URL}/simular`, {
       modo,
       duracionTicks,
       semilla,
       vehiculos,
     });
+    const resultadoModo = respuestaModo.data;
 
-    const resultado = respuestaMotor.data;
+    // 2. Si el modo no es SECUENCIAL, correr también el secuencial como base de comparación
+    let tiempoSecuencialMs = resultadoModo.tiempoEjecucionMs;
+    if (modo !== 'SECUENCIAL') {
+      const respuestaSecuencial = await axios.post(`${MOTOR_URL}/simular`, {
+        modo: 'SECUENCIAL',
+        duracionTicks,
+        semilla,
+        vehiculos,
+      });
+      tiempoSecuencialMs = respuestaSecuencial.data.tiempoEjecucionMs;
+    }
 
-    // 2. Guardar la simulación en la base de datos
+    // 3. Calcular speedup y eficiencia reales
+    const nucleosUsados = resultadoModo.nucleosUsados || 1;
+    const speedup = tiempoSecuencialMs / resultadoModo.tiempoEjecucionMs;
+    const eficiencia = speedup / nucleosUsados;
+
+    // 4. Guardar en la base de datos
     const simulacion = await prisma.simulacion.create({
       data: {
         modo,
@@ -37,18 +53,22 @@ async function crearSimulacion(req, res) {
         },
         metrica: {
           create: {
-            tiempoEjecucionMs: resultado.tiempoEjecucionMs,
-            velocidadPromedio: resultado.velocidadPromedio,
-            congestionPromedio: resultado.congestionPromedio,
-            speedup: resultado.speedup,
-            eficiencia: resultado.eficiencia,
+            tiempoEjecucionMs: resultadoModo.tiempoEjecucionMs,
+            velocidadPromedio: resultadoModo.velocidadPromedio,
+            congestionPromedio: resultadoModo.congestionPromedio,
+            speedup,
+            eficiencia,
           },
         },
       },
       include: { vehiculos: true, metrica: true },
     });
 
-    res.status(201).json({ simulacion, historial: resultado.historial });
+    res.status(201).json({
+      simulacion,
+      tiempoSecuencialMs,
+      historial: resultadoModo.historial,
+    });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: 'Error al ejecutar la simulación', detalle: error.message });
