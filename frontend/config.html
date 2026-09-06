@@ -63,10 +63,28 @@
 
     <div id="resultado" class="oculto"></div>
     <canvas id="canvasSimulacion" width="480" height="360" style="display:none; margin-top:15px; background:#0a1128; border-radius:8px; width:100%;"></canvas>
+
+  <div id="controlesSimulacion" class="oculto" style="display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap;">
+    <button id="btnPausar" class="control-btn">⏸ Pausar</button>
+    <button id="btnDetener" class="control-btn">⏹ Detener</button>
+    <button id="btnReiniciar" class="control-btn">🔄 Reiniciar</button>
+
+    <select id="velocidadReproduccion" class="control-select">
+      <option value="1">1x</option>
+      <option value="2">2x</option>
+      <option value="4">4x</option>
+    </select>
+
+    <label style="display:flex; align-items:center; gap:5px; font-size:13px; color:#c0c0e0;">
+      <input type="checkbox" id="loopCheckbox">
+      Repetir
+    </label>
+  </div>
   </div>
 
   <script src="js/api.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/canvas-render.js"></script>
 </body>
 </html>
-<script src="js/canvas-render.js"></script>
+

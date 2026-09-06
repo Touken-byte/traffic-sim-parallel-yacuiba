@@ -52,3 +52,13 @@ button.iniciar:disabled { background: #555; cursor: not-allowed; }
   margin-top: 20px; padding: 15px; background: #0f3460;
   border-radius: 8px; font-size: 14px; white-space: pre-wrap;
 }
+
+.control-btn {
+  padding: 6px 12px; border: none; border-radius: 6px;
+  background: #0f3460; color: white; font-size: 13px; cursor: pointer;
+}
+.control-btn:hover { background: #16407a; }
+.control-select {
+  padding: 6px; border: none; border-radius: 6px;
+  background: #0f3460; color: white; font-size: 13px;
+}
