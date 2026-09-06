@@ -52,6 +52,12 @@
 
     <label>Semilla aleatoria (reproducibilidad)</label>
     <input type="number" id="semilla" value="42">
+    <label>Modo de ejecución</label>
+    <select id="modoEjecucion" style="width:100%; padding:8px; border-radius:6px; border:none; background:#0f3460; color:white; font-size:14px;">
+      <option value="SECUENCIAL">Secuencial</option>
+      <option value="CPU">CPU Paralelo (multiprocessing)</option>
+      <option value="GPU" disabled>GPU (próximamente)</option>
+    </select>
 
     <button class="iniciar" id="btnIniciar">Iniciar Simulación</button>
 
