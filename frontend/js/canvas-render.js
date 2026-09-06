@@ -7,6 +7,31 @@ const simEstado = {
   loop: false,
 };
 
+function dibujarVehiculo(ctx, x, y, tipo, color, detenido) {
+  ctx.fillStyle = detenido ? '#555b6e' : color;
+
+  if (tipo === 'BUS') {
+    // Rectángulo alargado
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.fillRect(-7, -3.5, 14, 7);
+    ctx.restore();
+  } else if (tipo === 'MOTO') {
+    // Triángulo pequeño
+    ctx.beginPath();
+    ctx.moveTo(x, y - 4);
+    ctx.lineTo(x - 3.5, y + 3);
+    ctx.lineTo(x + 3.5, y + 3);
+    ctx.closePath();
+    ctx.fill();
+  } else {
+    // Círculo (AUTO, por defecto)
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
 function dibujarTick(tickIndex) {
   const canvas = document.getElementById('canvasSimulacion');
   const ctx = canvas.getContext('2d');
@@ -30,21 +55,17 @@ function dibujarTick(tickIndex) {
 
   const colores = { azul: '#3b82f6', amarillo: '#eab308', rojo: '#ef4444' };
 
-  ctx.fillStyle = '#0a1128';
+  // Fondo con leve transparencia en vez de limpiar todo de golpe -> crea efecto de estela
+  ctx.fillStyle = 'rgba(10, 17, 40, 0.35)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   historial[tickIndex].forEach((v) => {
     const [x, y] = proyectar(v.lon, v.lat);
     const detenido = v.velocidad === 0;
-
-    ctx.beginPath();
-    const radio = v.tipo === 'BUS' ? 6 : v.tipo === 'MOTO' ? 3 : 4;
-    ctx.arc(x, y, radio, 0, Math.PI * 2);
-    ctx.fillStyle = detenido ? '#555b6e' : (colores[v.color] || '#ffffff');
-    ctx.fill();
+    dibujarVehiculo(ctx, x, y, v.tipo, colores[v.color] || '#ffffff', detenido);
   });
 
-  ctx.fillStyle = '#a0a0c0';
+  ctx.fillStyle = '#e0e0f0';
   ctx.font = '12px Arial';
   ctx.fillText(`Tick ${tickIndex + 1}/${historial.length}`, 10, 15);
 }
