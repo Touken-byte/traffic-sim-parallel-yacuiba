@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Tráfico - Simulación</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="contenedor" style="max-width:700px;">
+    <h1>🚦 Simulación en curso</h1>
+    <p class="subtitulo" id="resumenSimulacion"></p>
+
+    <canvas id="canvasSimulacion" width="640" height="420" style="background:#0a1128; border-radius:8px; width:100%;"></canvas>
+
+    <div id="controlesSimulacion" style="display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap;">
+      <button id="btnPausar" class="control-btn">⏸ Pausar</button>
+      <button id="btnDetener" class="control-btn">⏹ Detener</button>
+      <button id="btnReiniciar" class="control-btn">🔄 Reiniciar</button>
+      <button id="btnResetVista" class="control-btn">🔍 Restablecer vista</button>
+
+      <select id="velocidadReproduccion" class="control-select">
+        <option value="1">1x</option>
+        <option value="2">2x</option>
+        <option value="4">4x</option>
+      </select>
+
+      <label style="display:flex; align-items:center; gap:5px; font-size:13px; color:#c0c0e0;">
+        <input type="checkbox" id="loopCheckbox">
+        Repetir
+      </label>
+    </div>
+    <p style="font-size:12px; color:#a0a0c0; margin:8px 0 0;">🖱️ Rueda del mouse: zoom · Arrastrar: mover</p>
+
+    <button class="iniciar" id="btnVerResultados" style="margin-top:20px;">Ver Resultados →</button>
+    <button class="iniciar" id="btnVolverConfig" style="margin-top:10px; background:#0f3460;">← Volver a Configuración</button>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/canvas-render.js"></script>
+  <script src="js/simulacion.js"></script>
+</body>
+</html>
